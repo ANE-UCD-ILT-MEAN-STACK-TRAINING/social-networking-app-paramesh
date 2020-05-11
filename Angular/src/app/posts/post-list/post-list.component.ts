@@ -11,17 +11,45 @@ export class PostListComponent implements OnInit, OnDestroy {
 
   constructor(public postsService : PostsService) { }
   private postSubscription : Subscription;
+  private mode = 'create';
+  private postId: string;
+  post: Post;
+  
+  isLoading = false;
+  //postsSub = false;
   @Input() posts: Post[] = []
   ngOnInit(): void {
     //    this.posts = this.postsService.getPosts();
-    this.postSubscription =  this.postsService.getPostUpdateListener()
-    .subscribe((postsReceived: Post[])=> {
-        this.posts = postsReceived;
-    });
+    this.isLoading = true;
+this.postsService.getPosts();
+this.postSubscription = this.postsService.getPostUpdateListener()
+.subscribe((posts: Post[]) => {
+setTimeout(()=>{ this.isLoading = false }, 2000);
+this.posts = posts;
+});
+
+
   }
    ngOnDestroy() {
      this.postSubscription.unsubscribe();
    }
 
+   /*onSavePost(form: NgForm){
+    if(form.invalid) return;
+    
+    this.isLoading = true;
+    if(this.mode === 'create') {
+    this.postsService.addPost(form.value.title, form.value.content);
+    }
+    else {
+    this.postsService.updatePost(this.postId, form.value.title, form.value.content);
+    }
+    form.resetForm();
+    }*/
+    
+   onDelete(postId: string){
+     //call service to delete the POST
+    this.postsService.deletePost(postId);  
+    }
 } 
 
