@@ -20,25 +20,14 @@ export class PostCreateComponent implements OnInit {
     isLoading = false;
     form: FormGroup;
     imagePreview: string; 
-    const file = (event.target.files);
+    //const file = (event.target.files);
   //constructor(public postsService: PostsService, 
   //  public route: ActivatedRoute) {}
     
-  onImagePicked(event: Event) {
-    const file = (event.target as HTMLInputElement).files[0];
-    this.form.patchValue({ image: file });
-    this.form.get("image").updateValueAndValidity();
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.imagePreview = reader.result as string;
-    };
-    reader.readAsDataURL(file);
-  }
-
+  
 /*  ngOnInit(): void {
   }*/
 
-  
   ngOnInit() {
     this.form = new FormGroup({
       title: new FormControl(null, {
@@ -77,8 +66,8 @@ export class PostCreateComponent implements OnInit {
   }
 
 
-//  enteredTitle = '';
- // enteredContent = '';
+  //enteredTitle = '';
+  //enteredContent = '';
  onSavePost() {
   if (this.form.invalid) {
     return;
@@ -101,11 +90,18 @@ export class PostCreateComponent implements OnInit {
   this.form.reset();
 }
 
-getPost(id: string) {
-  return this.http.get<{ _id: string, title: string, content: string, imagePath: string }>(
-    "http://localhost:3000/api/posts/" + id
-  );
+onImagePicked(event: Event) {
+  const file = (event.target as HTMLInputElement).files[0];
+  this.form.patchValue({ image: file });
+  this.form.get("image").updateValueAndValidity();
+  const reader = new FileReader();
+  reader.onload = () => {
+    this.imagePreview = reader.result as string;
+  };
+  reader.readAsDataURL(file);
 }
+
+
 
 }
 
