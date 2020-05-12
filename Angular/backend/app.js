@@ -32,7 +32,9 @@ app.use((req, res, next) => {
   );
   next();
 });
- 
+
+app.use("/images", express.static(path.join("backend/images")));
+const path = require("path");
 app.use("/api/posts", postsRoutes);
  
 module.exports = app;
