@@ -75,13 +75,35 @@ router.post(
 );
 
 router.get("", (req, res, next) => {
-  Post.find().then((documents) => {
-      res.status(200).json({
-          message: "Posts fetched successfully!",
-          posts: documents,
-      });
+  const pageSize = +req.query.pagesize;
+  const currentPage = +req.query.page;
+  let fetchedPosts;
+  console.log(pageSize);
+  console.log(currentPage);
+
+const postQuery = Post.find();  
+
+  // if inputs are valid
+  if (pageSize && currentPage) {
+    postQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
+  }
+
+  postQuery
+  .find()
+  .find()
+  .then((documents) => {
+    fetchedPosts = documents;
+    return Post.count();
+  })
+  .then((count) => {
+    res.status(200).json({
+      message: "Posts fetched successfully!",
+      posts: fetchedPosts,
+      maxPosts: count,
+    });
   });
 });
+
 
 router.get("/:id", (req, res, next) => {
   Post.findById(req.params.id).then(post => {
