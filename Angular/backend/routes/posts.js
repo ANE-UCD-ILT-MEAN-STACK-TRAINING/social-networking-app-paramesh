@@ -64,7 +64,7 @@ router.post(
       });
       post.save().then(createdPost => {
           res.status(201).json({
-              message: "Post adde d successfully",
+              message: "Post added successfully",
               post: {
                   ...createdPost,
                   id: createdPost._id
