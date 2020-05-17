@@ -12,21 +12,23 @@ import { AuthService } from 'src/app/auth/auth.service';
 })
 export class PostListComponent implements OnInit, OnDestroy {
 
-  
+  posts: Post[] = [];  
+  isLoading : boolean;
+  userId: string;
   private postSubscription : Subscription;
   private mode = 'create';
   private postId: string;
   private postsSub: Subscription; 
   private authStatusSub: Subscription; 
   userIsAuthenticated = false; 
-  posts: Post[] = [];  
-  isLoading = false;
+  
+
   totalPosts = 10;
   postsPerPage = 5;
   currentPage = 1;  
   pageSizeOptions = [1, 2, 5, 10];
   //postsSub: any;
-  userId: string;
+  
   //postsSub = false;
 //  @Input() posts: Post[] = []
 constructor(public postsService : PostsService, private authService: AuthService) { }  

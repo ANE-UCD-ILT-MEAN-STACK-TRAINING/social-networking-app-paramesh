@@ -12,21 +12,24 @@ import { Injectable } from '@angular/core';
      private isAuthenticated = false; 
      private tokenTimer: any; 
      private userId: string;
-     private saveAuthData(token: string, expirationDate: Date) { 
+     private saveAuthData(token: string, expirationDate: Date, userId: string) { 
          localStorage.setItem('token', token); 
          localStorage.setItem('expiration', expirationDate.toISOString()); 
+         localStorage.setItem("userId", userId);
      } 
  
 
      private clearAuthData() { 
          localStorage.removeItem('token'); 
          localStorage.removeItem('expiration'); 
+         localStorage.removeItem("userId");
      } 
  
 
      private getAuthData() { 
          const token = localStorage.getItem('token'); 
-         const expiration = localStorage.getItem('expiration'); 
+         const expiration = localStorage.getItem('expiration');
+         const userId = localStorage.getItem("userId"); 
          if (!token || !expiration) { 
              return; 
          } 
@@ -34,7 +37,8 @@ import { Injectable } from '@angular/core';
 
          return { 
              token: token, 
-             expirationDate: new Date(expiration) 
+             expirationDate: new Date(expiration),
+             userId: userId 
          } 
      } 
  
@@ -62,6 +66,7 @@ import { Injectable } from '@angular/core';
              .subscribe(response => { 
                  console.log(response); 
              }); 
+             this.router.navigate(["/login"]);
      } 
  
 
@@ -72,23 +77,25 @@ import { Injectable } from '@angular/core';
          }; 
  
 
-         this.http.post<{ token: string, expiresIn: number }>("http://localhost:3000/api/users/login", authData) 
+         this.http.post<{ token: string, expiresIn: number, userId: string }>("http://localhost:3000/api/users/login", authData) 
              .subscribe(response => { 
                  console.log(response); 
                  const token = response.token; 
                  this.token = token; 
  
-
-                 if (token) { 
-                     const expiresInDuration = response.expiresIn; 
-                     this.setAuthTimer(expiresInDuration); 
-                     this.isAuthenticated = true; 
-                     this.authStatusListener.next(true); 
-                     const now = new Date(); 
-                     const expirationDate = new Date(now.getTime() + expiresInDuration * 1000); 
-                     this.saveAuthData(token, expirationDate) 
-                     this.router.navigate(['/']); 
-                 } 
+                 if (token) {
+                    const expiresInDuration = response.expiresIn;
+                    this.setAuthTimer(expiresInDuration);
+                    this.isAuthenticated = true;
+                    this.userId = response.userId;
+                    this.authStatusListener.next(true);
+                    const now = new Date();
+                    const expirationDate = new Date(now.getTime() + expiresInDuration * 1000);
+                    console.log(expirationDate);
+                    this.saveAuthData(token, expirationDate, this.userId);
+                    this.router.navigate(["/"]);
+                  }
+          
              }); 
      } 
  
@@ -99,9 +106,10 @@ import { Injectable } from '@angular/core';
          this.token = null; 
          this.isAuthenticated = false; 
          this.authStatusListener.next(false); 
+         this.userId = null;
          clearTimeout(this.tokenTimer); 
          this.clearAuthData(); 
-         this.router.navigate(['/']); 
+         this.router.navigate(["/login"]); 
      } 
  
 
@@ -125,8 +133,23 @@ import { Injectable } from '@angular/core';
          return this.isAuthenticated; 
      } 
  
-
-     autoAuthUser() { 
+     autoAuthUser() {
+        const authInformation = this.getAuthData();
+        if (!authInformation) {
+          return;
+        }
+        const now = new Date();
+        const expiresIn = authInformation.expirationDate.getTime() - now.getTime();
+        if (expiresIn > 0) {
+          this.token = authInformation.token;
+          this.isAuthenticated = true;
+          this.userId = authInformation.userId;
+          this.setAuthTimer(expiresIn / 1000);
+          this.authStatusListener.next(true);
+        }
+      }
+    
+/*     autoAuthUser() { 
          const authInfo = this.getAuthData(); 
          if (!authInfo) return; 
          const now = new Date(); 
@@ -139,7 +162,7 @@ import { Injectable } from '@angular/core';
              this.setAuthTimer(expiresIn / 1000); 
              this.authStatusListener.next(true); 
          } 
-     } 
+     } */
  
      getUserId() { 
         return this.userId; 
