@@ -16,8 +16,7 @@ import { Component, OnInit, EventEmitter, AfterViewInit } from '@angular/core';
   isLoading = false;
   }*/
   
- export class PostCreateComponent implements OnInit, AfterViewInit { 
-   //constructor( public postsService : PostsService ) { } 
+ export class PostCreateComponent implements OnInit { 
    private mode = 'create'; 
    private postId: string; 
    post: Post; 
@@ -27,7 +26,7 @@ import { Component, OnInit, EventEmitter, AfterViewInit } from '@angular/core';
    filePicker = ''; 
  
 
-   public focusSetting = new EventEmitter<boolean>(); 
+   //public focusSetting = new EventEmitter<boolean>(); 
  
 
    constructor(public postsService: PostsService, 
@@ -82,10 +81,10 @@ import { Component, OnInit, EventEmitter, AfterViewInit } from '@angular/core';
 
    } 
  
-
+  /*
    ngAfterViewInit() { // Additional feature for focus 
      this.focusSetting.emit(true); 
-   } 
+   }*/ 
  
 
    onSavePost() { 

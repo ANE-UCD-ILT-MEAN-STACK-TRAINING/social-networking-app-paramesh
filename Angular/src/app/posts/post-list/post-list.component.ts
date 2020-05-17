@@ -3,7 +3,8 @@ import { Subscription} from 'rxjs';
 import { Post } from '../post.model';
 import { PostsService } from '../post.service';
 import { PageEvent } from "@angular/material/paginator";
-import { ThrowStmt } from '@angular/compiler';
+//import { ThrowStmt } from '@angular/compiler';
+import { AuthService } from 'src/app/auth/auth.service';
 @Component({
   selector: 'app-post-list',
   templateUrl: './post-list.component.html',
@@ -15,30 +16,45 @@ export class PostListComponent implements OnInit, OnDestroy {
   private postSubscription : Subscription;
   private mode = 'create';
   private postId: string;
+  private postsSub: Subscription; 
+  private authStatusSub: Subscription; 
+  userIsAuthenticated = false; 
   posts: Post[] = [];  
   isLoading = false;
   totalPosts = 10;
   postsPerPage = 5;
   currentPage = 1;  
   pageSizeOptions = [1, 2, 5, 10];
-  postsSub: any;
+  //postsSub: any;
+  userId: any;
+  authService: any;
+  //authService: any;
   //postsSub = false;
 //  @Input() posts: Post[] = []
 constructor(public postsService : PostsService) { }  
-ngOnInit(): void {
-    //    this.posts = this.postsService.getPosts();
-    this.isLoading = true;
-this.postsService.getPosts(this.postsPerPage, this.currentPage);
-this.postsSub = this.postsService
-.getPostUpdateListener()
-.subscribe((postData: { posts: Post[]; postCount: number}) => {
-  this.isLoading = false;
-  this.totalPosts = postData.postCount;
-  this.posts = postData.posts;
-});
+ngOnInit() { 
+  this.isLoading = true; 
+  this.postsService.getPosts(this.postsPerPage, this.currentPage); 
+  this.userId = this.authService.getUserId(); 
+  this.postsSub = this.postsService.getPostUpdateListener() 
+    .subscribe((postData: { posts: Post[], postCount: number }) => { 
+      setTimeout(() => { this.isLoading = false }, 2000); 
+      this.posts = postData.posts; 
+      this.totalPosts = postData.postCount; 
+    }); 
 
 
-  }
+  this.userIsAuthenticated = this.authService.getIsAuth(); 
+
+
+  this.authStatusSub = this.authService.getAuthStatusListener() 
+    .subscribe(isAuthenticated => { 
+      this.userIsAuthenticated = isAuthenticated; 
+      this.userId = this.authService.getUserId(); 
+    }); 
+} 
+
+  
    ngOnDestroy() {
      this.postSubscription.unsubscribe();
    }
