@@ -26,12 +26,10 @@ export class PostListComponent implements OnInit, OnDestroy {
   currentPage = 1;  
   pageSizeOptions = [1, 2, 5, 10];
   //postsSub: any;
-  userId: any;
-  authService: any;
-  //authService: any;
+  userId: string;
   //postsSub = false;
 //  @Input() posts: Post[] = []
-constructor(public postsService : PostsService) { }  
+constructor(public postsService : PostsService, private authService: AuthService) { }  
 ngOnInit() { 
   this.isLoading = true; 
   this.postsService.getPosts(this.postsPerPage, this.currentPage); 
@@ -56,7 +54,8 @@ ngOnInit() {
 
   
    ngOnDestroy() {
-     this.postSubscription.unsubscribe();
+     this.postsSub.unsubscribe();
+     this.authStatusSub.unsubscribe();
    }
 
    /*onSavePost(form: NgForm){

@@ -11,6 +11,7 @@ import { Injectable } from '@angular/core';
      private authStatusListener = new Subject<boolean>(); 
      private isAuthenticated = false; 
      private tokenTimer: any; 
+     private userId: string;
      private saveAuthData(token: string, expirationDate: Date) { 
          localStorage.setItem('token', token); 
          localStorage.setItem('expiration', expirationDate.toISOString()); 
@@ -140,6 +141,9 @@ import { Injectable } from '@angular/core';
          } 
      } 
  
+     getUserId() { 
+        return this.userId; 
+    } 
 
  
 
